@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Timetable Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-['Inter']">
+    <div id="app" class="min-h-screen">
+        <div id="loginSection" class="p-6 max-w-md mx-auto">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h1 class="text-2xl font-bold text-center mb-6">College Timetable Manager</h1>
+                <div class="space-y-4">
+                    <input type="text" id="username" placeholder="Username" class="w-full p-3 border rounded-lg">
+                    <input type="password" id="password" placeholder="Password" class="w-full p-3 border rounded-lg">
+                    <select id="userType" class="w-full p-3 border rounded-lg">
+                        <option value="">Select User Type</option>
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                    </select>
+                    <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700">Login</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard" class="hidden">
+            <nav class="bg-white shadow-lg">
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="flex justify-between h-16">
+                        <div class="flex items-center">
+                            <span class="text-xl font-semibold">Dashboard</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="showSection('timetable')" class="nav-btn">Timetable</button>
+                            <button onclick="showSection('departments')" class="nav-btn">Departments</button>
+                            <button onclick="showSection('courses')" class="nav-btn">Courses</button>
+                            <button onclick="showSection('slots')" class="nav-btn">Time Slots</button>
+                            <button onclick="logout()" class="text-red-600">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="max-w-7xl mx-auto p-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-lg font-semibold mb-4">Current Lecture</h2>
+                        <div id="currentLecture" class="space-y-2">
+                            <p class="text-xl font-bold" id="currentSubject">-</p>
+                            <p class="text-gray-600" id="currentTime">-</p>
+                            <p class="text-gray-600" id="currentTeacher">-</p>
+                            <p class="text-gray-600" id="currentRoom">-</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-lg font-semibold mb-4">Next Lecture</h2>
+                        <div id="nextLecture" class="space-y-2">
+                            <p class="text-xl font-bold" id="nextSubject">-</p>
+                            <p class="text-gray-600" id="nextTime">-</p>
+                            <p class="text-gray-600" id="nextTeacher">-</p>
+                            <p class="text-gray-600" id="nextRoom">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="timetableSection" class="max-w-7xl mx-auto p-6">
+                <div class="bg-white rounded-lg shadow-lg p-6 overflow-x-auto">
+                    <h2 class="text-xl font-semibold mb-4">Weekly Timetable</h2>
+                    <table class="w-full min-w-[800px]">
+                        <thead>
+                            <tr>
+                                <th class="p-3 border">Time/Day</th>
+                                <th class="p-3 border">Monday</th>
+                                <th class="p-3 border">Tuesday</th>
+                                <th class="p-3 border">Wednesday</th>
+                                <th class="p-3 border">Thursday</th>
+                                <th class="p-3 border">Friday</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timetableBody">
+                            <!-- Timetable will be dynamically added -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="departmentsSection" class="max-w-7xl mx-auto p-6 hidden">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4">Departments</h2>
+                    <div class="grid md:grid-cols-3 gap-4" id="departmentList"></div>
+                </div>
+            </div>
+
+            <div id="coursesSection" class="max-w-7xl mx-auto p-6 hidden">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4">Course Management</h2>
+                    <div class="space-y-4">
+                        <input type="text" id="courseName" placeholder="Course Name" class="w-full p-3 border rounded-lg">
+                        <input type="text" id="courseCode" placeholder="Course Code" class="w-full p-3 border rounded-lg">
+                        <select id="courseDepartment" class="w-full p-3 border rounded-lg">
+                            <option value="">Select Department</option>
+                        </select>
+                        <button onclick="addCourse()" class="bg-green-600 text-white py-2 px-4 rounded-lg">Add Course</button>
+                    </div>
+                    <div class="mt-6">
+                        <h3 class="font-semibold mb-3">Existing Courses</h3>
+                        <div id="courseList" class="grid md:grid-cols-2 gap-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slotsSection" class="max-w-7xl mx-auto p-6 hidden">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4">Time Slot Management</h2>
+                    <div class="space-y-4">
+                        <input type="time" id="slotStartTime" class="w-full p-3 border rounded-lg">
+                        <input type="time" id="slotEndTime" class="w-full p-3 border rounded-lg">
+                        <select id="slotDay" class="w-full p-3 border rounded-lg">
+                            <option value="">Select Day</option>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                        </select>
+                        <button onclick="addTimeSlot()" class="bg-green-600 text-white py-2 px-4 rounded-lg">Add Time Slot</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        const timetableData = {
+            'Monday': [
+                { time: '9:00 AM - 10:30 AM', subject: 'Mathematics', teacher: 'Dr. Smith', room: '101' },
+                { time: '10:45 AM - 12:15 PM', subject: 'Physics', teacher: 'Prof. Johnson', room: '102' }
+            ],
+            'Tuesday': [
+                { time: '9:00 AM - 10:30 AM', subject: 'Chemistry', teacher: 'Dr. Williams', room: '103' },
+                { time: '10:45 AM - 12:15 PM', subject: 'Biology', teacher: 'Prof. Brown', room: '104' }
+            ]
+        };
+
+        const departments = [
+            { id: 1, name: 'Computer Science', courses: 15 },
+            { id: 2, name: 'Electrical Engineering', courses: 12 },
+            { id: 3, name: 'Mechanical Engineering', courses: 10 }
+        ];
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const userType = document.getElementById('userType').value;
+
+            if (username && password && userType) {
+                currentUser = { username, userType };
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                initializeDashboard();
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+
+        function showSection(section) {
+            const sections = ['timetable', 'departments', 'courses', 'slots'];
+            sections.forEach(s => {
+                const elem = document.getElementById(s + 'Section');
+                if (elem) {
+                    elem.classList.toggle('hidden', s !== section);
+                }
+            });
+        }
+
+        function updateCurrentLecture() {
+            const now = new Date();
+            const day = now.toLocaleDateString('en-US', { weekday: 'long' });
+            const currentLecture = timetableData[day]?.[0] || null;
+            const nextLecture = timetableData[day]?.[1] || null;
+
+            updateLectureDisplay('current', currentLecture);
+            updateLectureDisplay('next', nextLecture);
+
+            if (currentLecture && Notification.permission === "granted") {
+                new Notification("Current Lecture", {
+                    body: `${currentLecture.subject}\n${currentLecture.teacher}\n${currentLecture.time}\nRoom: ${currentLecture.room}`
+                });
+            }
+        }
+
+        function updateLectureDisplay(type, lecture) {
+            document.getElementById(`${type}Subject`).textContent = lecture?.subject || 'No lecture';
+            document.getElementById(`${type}Time`).textContent = lecture?.time || '-';
+            document.getElementById(`${type}Teacher`).textContent = lecture?.teacher || '-';
+            document.getElementById(`${type}Room`).textContent = lecture?.room || '-';
+        }
+
+        function initializeDashboard() {
+            const departmentList = document.getElementById('departmentList');
+            departmentList.innerHTML = departments.map(dept => `
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-semibold">${dept.name}</h3>
+                    <p class="text-gray-600">${dept.courses} courses</p>
+                </div>
+            `).join('');
+
+            const deptSelect = document.getElementById('courseDepartment');
+            deptSelect.innerHTML += departments.map(dept => 
+                `<option value="${dept.id}">${dept.name}</option>`
+            ).join('');
+
+            if ("Notification" in window) {
+                Notification.requestPermission();
+            }
+
+            updateCurrentLecture();
+            setInterval(updateCurrentLecture, 60000);
+        }
+
+        function addCourse() {
+            const courseName = document.getElementById('courseName').value;
+            const courseCode = document.getElementById('courseCode').value;
+            const departmentId = document.getElementById('courseDepartment').value;
+            
+            if (courseName && courseCode && departmentId) {
+                alert(`Course ${courseName} (${courseCode}) added successfully!`);
+                document.getElementById('courseName').value = '';
+                document.getElementById('courseCode').value = '';
+                document.getElementById('courseDepartment').value = '';
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        function addTimeSlot() {
+            const startTime = document.getElementById('slotStartTime').value;
+            const endTime = document.getElementById('slotEndTime').value;
+            const day = document.getElementById('slotDay').value;
+            
+            if (startTime && endTime && day) {
+                alert(`Time slot added: ${day} ${startTime} - ${endTime}`);
+                document.getElementById('slotStartTime').value = '';
+                document.getElementById('slotEndTime').value = '';
+                document.getElementById('slotDay').value = '';
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+    </script>
+
+    <style>
+        .nav-btn {
+            @apply px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-btn {
+                @apply px-2 py-1 text-sm;
+            }
+        }
+    </style>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
